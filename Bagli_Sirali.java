@@ -8,87 +8,66 @@ package bagli_sirali;
  *
  * @author EXCALIBUR
  */
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
+
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
-class Sayi {
+class VeriElemani {
     int veri;
     int adres;
 
-    public Sayi(int veri, int adres) {
+    public VeriElemani(int veri, int adres) {
         this.veri = veri;
         this.adres = adres;
     }
 
     @Override
     public String toString() {
-        return veri + "\t\t\t" + adres;
+        return String.format("%-5d %-5d", veri, adres);
     }
 }
 
 public class Bagli_Sirali {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Dosya adını girin: ");
+        System.out.print("Dosya adini girin: ");
         String dosyaAdi = scanner.nextLine();
-        scanner.close();
 
-        try {
-            File dosya = new File(dosyaAdi);
-            Scanner dosyaOkuyucu = new Scanner(dosya);
+        try (BufferedReader br = new BufferedReader(new FileReader(dosyaAdi))) {
+            String line;
+            VeriElemani[] veriDizisi = new VeriElemani[100]; 
+            int index = 0;
 
-            int sayiAdres = 0;
-            Sayi[] dizi = new Sayi[100]; 
-          
-            System.out.println("x\t\t\ty");
-            System.out.println("--------------------------------");
-
-            
-            while (dosyaOkuyucu.hasNextLine()) {
-                String satir = dosyaOkuyucu.nextLine().trim();
-                if (!satir.isEmpty()) {
-                    int sayi = Integer.parseInt(satir);
-                    dizi[sayiAdres] = new Sayi(sayi, sayiAdres);
-                    sayiAdres++;
-                }
+            while ((line = br.readLine()) != null) {
+                int veri = Integer.parseInt(line);
+                veriDizisi[index++] = new VeriElemani(veri, index); 
             }
 
-            
-            for (int i = 0; i < dizi.length; i++) {
-                if (dizi[i] != null) {
-                    System.out.println(dizi[i].veri + "\t\t\t" + dizi[i].adres);
-                }
-            }
-
-            
-            for (int i = 0; i < sayiAdres - 1; i++) {
-                int minIndex = i;
-                for (int j = i + 1; j < sayiAdres; j++) {
-                    if (dizi[j] != null && dizi[minIndex] != null && dizi[j].veri < dizi[minIndex].veri) {
-                        minIndex = j;
-                    }
-                }
-                // Swap
-                Sayi temp = dizi[minIndex];
-                dizi[minIndex] = dizi[i];
-                dizi[i] = temp;
+            System.out.println("Dizinin Baslangic Durumu:");
+            for (int i = 0; i < index; i++) {
+                System.out.println(String.format("%-5d %-5s", veriDizisi[i].veri, veriDizisi[i].adres)); // Başlangıç durumunu ekrana yazdır
             }
 
            
-            System.out.println("--------------------------------");
-            for (int i = 0; i < sayiAdres; i++) {
-                if (dizi[i] != null) {
-                    System.out.println(dizi[i].veri + "\t\t\t" + i);
+            for (int i = 0; i < index - 1; i++) {
+                for (int j = i + 1; j < index; j++) {
+                    if (veriDizisi[i].veri > veriDizisi[j].veri) {
+                        VeriElemani temp = veriDizisi[i];
+                        veriDizisi[i] = veriDizisi[j];
+                        veriDizisi[j] = temp;
+                    }
                 }
             }
 
-            dosyaOkuyucu.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Dosya bulunamadı: " + dosyaAdi);
-        } catch (NumberFormatException e) {
-            System.out.println("Dosyada beklenmeyen bir format hatası var.");
+            System.out.println("\nDizinin Siralanmis Durumu:");
+            for (int i = 0; i < index; i++) {
+                System.out.println(String.format("%-5d %-5s", veriDizisi[i].veri, veriDizisi[i].adres)); // Sıralanmış durumu ekrana yazdır
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
